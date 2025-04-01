@@ -3,14 +3,11 @@
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
 
-// Wi-Fi Credentials
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
-// ThingSpeak API Details
-const char* thingSpeakAPI = "https://api.thingspeak.com/update?api_key=VPPFQPASEP7EB5Z3";  // Replace with your API Key
+const char* thingSpeakAPI = "https://api.thingspeak.com/update?api_key=VPPFQPASEP7EB5Z3";  
 
-// Power Calculation Constants
 const float voltage = 230.0;  // Assume classroom voltage is 230V
 float current = 0.0;  // Simulated current sensor value
 
@@ -23,14 +20,12 @@ void setup() {
     Serial.begin(115200);
     WiFi.begin(ssid, password);
 
-    // Initialize OLED Display
     if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {  
         Serial.println("SSD1306 initialization failed!");
         while (1);
     }
     display.clearDisplay();
     
-    // Wi-Fi Connection
     Serial.print("Connecting to WiFi");
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
@@ -40,15 +35,14 @@ void setup() {
 }
 
 void loop() {
-    // Simulate ACS712 Current Sensor Data (Random 0-10A)
+    // Simulating ACS712 Current Sensor Data (Random 0-10A)
     current = random(1, 10);
-    float power = voltage * current;  // P = V × I
+    float power = voltage * current;  
 
-    // Display Data in Serial Monitor
     Serial.print("Current: "); Serial.print(current); Serial.print(" A, ");
     Serial.print("Power: "); Serial.print(power); Serial.println(" W");
 
-    // Display Data on OLED Screen
+    // Displaying Data on OLED Screen
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
@@ -57,7 +51,7 @@ void loop() {
     display.print("Power: "); display.print(power); display.println(" W");
     display.display();
 
-    // Send Data to ThingSpeak
+    // Sending Data to ThingSpeak
     if (WiFi.status() == WL_CONNECTED) {
         HTTPClient http;
         String url = String(thingSpeakAPI) + "&field1=" + String(current) + "&field2=" + String(power);
@@ -72,10 +66,10 @@ void loop() {
         http.end();
     }
 
-    // Alert if Power Exceeds 1500W
+    // Alert if Power Exceeds 1500W - threshold
     if (power > 1500) {
         Serial.println("⚠ ALERT: High Power Consumption Detected!");
     }
 
-    delay(10000);  // Send data every 10 seconds
+    delay(10000); 
 }
